@@ -1,5 +1,7 @@
 package com.example.weatherapp;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -10,8 +12,14 @@ public class WeatherService {
     private final String apiKey = "d54703e81bd514215a2d361a49c4c150";
     private final String baseUrl = "https://api.openweathermap.org/data/2.5/weather";
 
+    @Cacheable(value = "weather", key = "city")
     public WeatherResponse getWeather(String city) {
         String url = baseUrl + "?q=" + city + "&appid=" + apiKey + "&units=metric";
         return restTemplate.getForObject(url, WeatherResponse.class);
+    }
+
+    @CacheEvict(value = "weather", key = "#city")
+    public void clearCache(String city) {
+        System.out.println("Cache cleared for city: " + city);
     }
 }
